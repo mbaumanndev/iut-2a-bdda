@@ -1,0 +1,106 @@
+version: '3.4'
+
+services:
+  mssql:
+    restart: 'no'
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - 1433:1433
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Amiens2020!
+    volumes:
+      - sqldata:/var/opt/mssql
+
+  sqlcmd:
+    restart: 'no'
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    depends_on:
+      - mssql
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Amiens2020!
+    command: >
+      sh -c '/opt/mssql-tools/bin/sqlcmd -S mssql -U sa -P Amiens2020!'
+
+  redis:
+    restart: 'no'
+    image: redislabs/redisearch:1.99.1
+    command: --loglevel verbose
+
+  rcli:
+    restart: 'no'
+    image: redislabs/redisearch:1.99.1
+    depends_on:
+      - redis
+    command: >
+      sh -c 'redis-cli -h redis '
+
+  readis:
+    restart: 'no'
+    image: hollodotme/readis
+    ports:
+      - 8080:80
+    volumes:
+      - ./config:/code/config:ro
+    depends_on:
+      - redis
+
+  phpredisadmin:
+    restart: 'no'
+    image: erikdubbelboer/phpredisadmin
+    environment:
+      - REDIS_1_HOST=redis
+      - REDIS_1_PORT=6379
+    depends_on:
+      - redis
+    ports:
+      - 8081:80
+      
+  mongo:
+    restart: 'no'
+    image: mongo:4.2.0
+    command: --serviceExecutor adaptive
+    volumes:
+      - mongodata:/data/db
+
+  mgcli:
+    restart: 'no'
+    image: mongo:4.2.0
+    depends_on:
+      - mongo
+    command: >
+      sh -c 'mongo --host mongo '
+
+  mongo-express:
+    restart: 'no'
+    image: mongo-express:0.49.0
+    ports:
+      - 8082:8081
+    depends_on:
+      - mongo
+
+  cassandra:
+    restart: 'no'
+    image: cassandra:3.11.5
+
+  cqlsh:
+    restart: 'no'
+    image: cassandra:3.11.5
+    depends_on:
+      - cassandra
+    command: >
+      sh -c 'cqlsh cassandra '
+
+  neo4j:
+    restart: 'no'
+    image: neo4j:3.5.12
+    ports:
+      - 7474:7474
+      - 7687:7687
+    environment:
+      - NEO4J_AUTH=none
+
+volumes:
+  mongodata:
+  sqldata:
