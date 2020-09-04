@@ -11,6 +11,8 @@ services:
       - SA_PASSWORD=Amiens2020!
     volumes:
       - sqldata:/var/opt/mssql
+    labels:
+      - "net.maxime-baumann.iut"
 
   sqlcmd:
     restart: 'no'
@@ -22,11 +24,17 @@ services:
       - SA_PASSWORD=Amiens2020!
     command: >
       sh -c '/opt/mssql-tools/bin/sqlcmd -S mssql -U sa -P Amiens2020!'
+    labels:
+      - "net.maxime-baumann.iut"
 
   redis:
     restart: 'no'
     image: redislabs/redisearch:1.99.1
     command: --loglevel verbose
+    volumes:
+      - redisdata:/data
+    labels:
+      - "net.maxime-baumann.iut"
 
   rcli:
     restart: 'no'
@@ -35,6 +43,8 @@ services:
       - redis
     command: >
       sh -c 'redis-cli -h redis '
+    labels:
+      - "net.maxime-baumann.iut"
 
   readis:
     restart: 'no'
@@ -45,6 +55,8 @@ services:
       - ./config:/code/config:ro
     depends_on:
       - redis
+    labels:
+      - "net.maxime-baumann.iut"
 
   phpredisadmin:
     restart: 'no'
@@ -56,6 +68,8 @@ services:
       - redis
     ports:
       - 8081:80
+    labels:
+      - "net.maxime-baumann.iut"
       
   mongo:
     restart: 'no'
@@ -63,6 +77,8 @@ services:
     command: --serviceExecutor adaptive
     volumes:
       - mongodata:/data/db
+    labels:
+      - "net.maxime-baumann.iut"
 
   mgcli:
     restart: 'no'
@@ -71,6 +87,8 @@ services:
       - mongo
     command: >
       sh -c 'mongo --host mongo '
+    labels:
+      - "net.maxime-baumann.iut"
 
   mongo-express:
     restart: 'no'
@@ -79,10 +97,16 @@ services:
       - 8082:8081
     depends_on:
       - mongo
+    labels:
+      - "net.maxime-baumann.iut"
 
   cassandra:
     restart: 'no'
     image: cassandra:3.11.5
+    volumes:
+      - cassdata:/var/lib/cassandra
+    labels:
+      - "net.maxime-baumann.iut"
 
   cqlsh:
     restart: 'no'
@@ -91,6 +115,8 @@ services:
       - cassandra
     command: >
       sh -c 'cqlsh cassandra '
+    labels:
+      - "net.maxime-baumann.iut"
 
   neo4j:
     restart: 'no'
@@ -100,7 +126,24 @@ services:
       - 7687:7687
     environment:
       - NEO4J_AUTH=none
+    volumes:
+      - neodata:/data
+    labels:
+      - "net.maxime-baumann.iut"
 
 volumes:
-  mongodata:
+  redisdata:
+    labels:
+      - "net.maxime-baumann.iut"
   sqldata:
+    labels:
+      - "net.maxime-baumann.iut"
+  mongodata:
+    labels:
+      - "net.maxime-baumann.iut"
+  cassdata:
+    labels:
+      - "net.maxime-baumann.iut"
+  neodata:
+    labels:
+      - "net.maxime-baumann.iut"
