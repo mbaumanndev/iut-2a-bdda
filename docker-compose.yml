@@ -31,6 +31,8 @@ services:
     restart: 'no'
     image: redislabs/redisearch:1.99.1
     command: --loglevel verbose
+    ports:
+      - 6379:6379
     volumes:
       - redisdata:/data
     labels:
