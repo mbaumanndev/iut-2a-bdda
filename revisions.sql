@@ -103,3 +103,29 @@ AS
     OR DATEADD(hh, -12, GETDATE()) < [PST].[Revision] /* Moins 12h */
 
 GO
+
+/* Fonctions utilisateur (UDF -> User Defined Functions) */
+CREATE OR ALTER FUNCTION [dbo].[RecupereNbAuteurs](@NbAuteur INT)
+RETURNS TABLE
+AS
+RETURN
+(
+    SELECT TOP(@NbAuteur) [Nom], [Prenom]
+    FROM [dbo].[Auteur_AUR] (NOLOCK)
+)
+
+GO
+
+CREATE OR ALTER FUNCTION [dbo].[CompteAuteurs]()
+RETURNS BIGINT
+AS
+BEGIN
+    DECLARE @Resultat BIGINT
+
+    SELECT @Resultat = COUNT(*)
+    FROM [dbo].[Auteur_AUR] (NOLOCK)
+
+    RETURN(@Resultat)
+END
+
+GO
