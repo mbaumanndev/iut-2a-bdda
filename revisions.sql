@@ -129,3 +129,50 @@ BEGIN
 END
 
 GO
+
+-- Triggers et curseurs
+
+CREATE OR ALTER TRIGGER [dbo].[trig_UpdateRevisionPost]
+    ON [dbo].[Post_PST] -- On attache le trigger à une table
+    AFTER UPDATE -- On attache le trigger à un événement (insert, update, delete)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @PstId INT
+    DECLARE @NbItems INT
+
+    SELECT @NbItems = COUNT(*) FROM INSERTED -- Les enregistrements concernés par le trigger sont enregistrés dans une sorte de table
+
+    -- Les curseurs sont coûteux en ressources, on évite d'en créer un pour un seul élément
+    IF @NbItems > 1
+    BEGIN
+        DECLARE curs CURSOR FOR SELECT [Id] FROM INSERTED -- Le curseur est une variable "pointant" sur une requête
+
+        OPEN curs -- On ouvre le curseur pour charger les résultats
+
+        FETCH NEXT FROM curs INTO @PstId
+        WHILE (@@FETCH_STATUS = 0) -- Tant qu'on peut itérer
+        BEGIN
+            UPDATE [dbo].[Post_PST]
+            SET [Revision] = GETDATE()
+            WHERE [Id] = @PstId
+
+            FETCH NEXT FROM curs INTO @PstId
+        END
+
+        -- Important ! On ferme le curseur et on libère sa mémoire
+        CLOSE curs
+        DEALLOCATE curs
+    END
+    ELSE
+    BEGIN
+        SELECT TOP 1 @PostId = [Id] FROM INSERTED
+
+        UPDATE [dbo].[Post_PST]
+        SET [Revision] = GETDATE()
+        WHERE [Id] = @PstId
+    END
+END
+
+GO
