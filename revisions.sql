@@ -176,3 +176,28 @@ BEGIN
 END
 
 GO
+
+-- Transactions
+
+BEGIN TRANSACTION MA_TRANSACTION --On nomme la transaction
+BEGIN TRY
+    INSERT INTO [dbo].[Auteur_AUR] ([Nom], [Prenom])
+    VALUES      (N'DURAND', N'David')
+
+    INSERT INTO [dbo].[Auteur_AUR] ([Id], [Nom], [Prenom])
+    VALUES      ('af249160-c073-4bf5-a646-31c83c8c5a0e', N'BAUMANN', N'Maxime')
+
+    INSERT INTO [dbo].[Auteur_AUR] ([Nom], [Prenom])
+    VALUES      (N'CLERENTIN', N'Arnaud')
+
+    COMMIT TRANSACTION MA_TRANSACTION -- Commit persiste les écritures en BDD, si on arrive jusque là
+END TRY
+BEGIN CATCH
+    -- Le rollback va annuler l'ensemble des modifications effectuées dans la transaction
+    ROLLBACK TRANSACTION MA_TRANSACTION
+
+    -- On peut récupérer des informations sur l'erreur qui est survenue
+    SELECT ERROR_NUMBER(), ERROR_MESSAGE()
+END CATCH
+
+GO
