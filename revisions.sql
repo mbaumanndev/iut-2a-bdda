@@ -201,3 +201,112 @@ BEGIN CATCH
 END CATCH
 
 GO
+
+-- Procédures stockées
+
+CREATE OR ALTER PROCEDURE [dbo].[prc_CreationPost]
+    @AuteurId UNIQUEIDENTIFIER,
+    @Titre NVARCHAR(255),
+    @Content NVARCHAR(MAX)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRANSACTION CreaPst
+    BEGIN TRY
+        IF NOT EXISTS (
+            SELECT  [Id]
+            FROM    [dbo].[Auteur_AUR]
+            WHERE   [Id] = @AuteurId)
+            THROW 51000, 'L''auteur n''existe pas', 1
+
+        INSERT INTO [dbo].[Post_PST] ([Titre], [Contenu])
+        VALUES (@Titre, @Content)
+
+        COMMIT TRANSACTION CreaPst
+
+        SELECT 0 AS [Number], N'' AS [Message]
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION CreaPst
+
+        SELECT ERROR_NUMBER() AS [Number], ERROR_MESSAGE() AS [Message]
+    END CATCH
+END;
+
+GO
+
+-- Cette procédure utilise une variable de type Table
+-- Ces variables sont créées en mémoire et ne peuvent pas être utilisée dans des transactions
+-- Elles peuvent servir de paramètre pour des procédures et fonctions
+-- On ne peut également s'en servir qu'entre deux "GO"
+-- /!\ Ce ne sont pas des tables temporaires
+CREATE OR ALTER PROCEDURE [dbo].[prc_InsAuteurs]
+    @Auteurs NVARCHAR(MAX)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @AuteurTable AS TABLE (
+        [Nom] NVARCHAR(255),
+        [Prenom] NVARCHAR(255)
+    )
+
+    INSERT INTO @AuteurTable([Nom], [Prenom])
+    SELECT	PARSENAME(REPLACE([value], ';', '.'), 2) AS [Prenom],
+            PARSENAME(REPLACE([value], ';', '.'), 1) AS [Nom]
+    FROM    STRING_SPLIT(@Auteurs, '|')
+    
+    INSERT INTO [dbo].[Auteur_AUR] ([Nom], [Prenom])
+    SELECT [Nom], [Prenom]
+    FROM @AuteurTable
+END
+
+GO
+
+-- Cette procédure utilise une "WITH COMMON_TABLE_EXPRESSION"
+-- Elles expirent après la première instruction qui n'est pas une "WITH COMMON_TABLE_EXPRESSION"
+-- Elles doivent forcément être précédées par un point-virgule
+CREATE OR ALTER PROCEDURE [dbo].[prc_InsAuteurs]
+    @Auteurs NVARCHAR(MAX)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRANSACTION InsAut
+    BEGIN TRY
+        ;WITH Auteurs AS (
+            SELECT	CAST(PARSENAME(REPLACE([value], ';', '.'), 2), NVARCHAR(255)) AS [Prenom],
+                    CAST(PARSENAME(REPLACE([value], ';', '.'), 1), NVARCHAR(255)) AS [Nom]
+            FROM    STRING_SPLIT(@Auteurs, '|')
+        )
+
+        INSERT INTO [dbo].[Auteur_AUR] ([Nom], [Prenom])
+        SELECT [Nom], [Prenom]
+        FROM Auteurs
+
+        COMMIT TRANSACTION InsAut
+
+        SELECT 0 AS [Number], N'' AS [Message]
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION InsAut
+
+        SELECT ERROR_NUMBER() AS [Number], ERROR_MESSAGE() AS [Message]
+    END CATCH
+END
+
+GO
+
+DECLARE @Table TABLE (
+    [Number] INT,
+    [Message] NVARCHAR(MAX)
+)
+
+INSERT INTO @Table
+EXEC [dbo].[prc_InsAuteurs] @Auteurs = N'Prénom;NOM|Prénom1;NOM1|Prénom2;Nom2'
+
+SELECT * FROM @Table
+
+GO
+
