@@ -6,6 +6,18 @@ Ce dépôt contient des ressources à destination des étudiants de seconde ann�
 Utilisation
 -----------
 
+### Identifiants
+
+SQL Server :
+- login : `sa`
+- password : `Amiens2020!`
+- base (optionnel) : `master`
+
+PostgreSQL :
+- login : `postgres`
+- password : `Amiens2020!`
+- base (optionnel) : `postgres`
+
 ### UNIX / WSL2
 
 Sous unix ou wsl2, vous pouvez utiliser la commande `make` pour démarrer et arrêter les conteneurs, vous pouvez consulter les commandes disponibles avec `make` ou `make help`.
