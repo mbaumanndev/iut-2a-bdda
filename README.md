@@ -101,8 +101,9 @@ Outils
 
 Nous avons à disposition plusieurs IHM en mode web pour différents SGBDs
 
-| SGBD    | Lien                                                                       |
-|---------|----------------------------------------------------------------------------|
-| Redis   | [Readis](http://127.0.0.1:8080/) - [phpRedisAdmin](http://127.0.0.1:8081/) |
-| MongoDB | [MongoExpress](http://127.0.0.1:8082)                                      |
-| Neo4j   | [Neo4j](http://127.0.0.1:7474)                                             |
+| SGBD       | Lien                                                                       |
+|------------|----------------------------------------------------------------------------|
+| Redis      | [Readis](http://127.0.0.1:8080/) - [phpRedisAdmin](http://127.0.0.1:8081/) |
+| MongoDB    | [MongoExpress](http://127.0.0.1:8082)                                      |
+| Neo4j      | [Neo4j](http://127.0.0.1:7474)                                             |
+| Postgres   | [Adminer](http://127.0.0.1:8083)                                           |

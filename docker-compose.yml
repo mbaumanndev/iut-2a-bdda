@@ -29,7 +29,7 @@ services:
 
   redis:
     restart: 'no'
-    image: redislabs/redisearch:1.99.1
+    image: redislabs/redisearch:2.2.6
     command: --loglevel verbose
     ports:
       - 6379:6379
@@ -40,7 +40,7 @@ services:
 
   rcli:
     restart: 'no'
-    image: redislabs/redisearch:1.99.1
+    image: redislabs/redisearch:2.2.6
     depends_on:
       - redis
     command: >
@@ -75,7 +75,7 @@ services:
       
   mongo:
     restart: 'no'
-    image: mongo:4.2.0
+    image: mongo:4.4.11
     command: --serviceExecutor adaptive
     volumes:
       - mongodata:/data/db
@@ -84,7 +84,7 @@ services:
 
   mgcli:
     restart: 'no'
-    image: mongo:4.2.0
+    image: mongo:4.4.11
     depends_on:
       - mongo
     command: >
@@ -94,7 +94,7 @@ services:
 
   mongo-express:
     restart: 'no'
-    image: mongo-express:0.49.0
+    image: mongo-express:0.54.0
     ports:
       - 8082:8081
     depends_on:
@@ -102,27 +102,9 @@ services:
     labels:
       - "net.maxime-baumann.iut"
 
-  cassandra:
-    restart: 'no'
-    image: cassandra:3.11.5
-    volumes:
-      - cassdata:/var/lib/cassandra
-    labels:
-      - "net.maxime-baumann.iut"
-
-  cqlsh:
-    restart: 'no'
-    image: cassandra:3.11.5
-    depends_on:
-      - cassandra
-    command: >
-      sh -c 'cqlsh cassandra '
-    labels:
-      - "net.maxime-baumann.iut"
-
   neo4j:
     restart: 'no'
-    image: neo4j:3.5.12
+    image: neo4j:4.1.4
     ports:
       - 7474:7474
       - 7687:7687
@@ -132,6 +114,30 @@ services:
       - neodata:/data
     labels:
       - "net.maxime-baumann.iut"
+
+  pg:
+    restart: 'no'
+    image: postgres:14.1-alpine
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=Amiens2020!
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  pgcli:
+    restart: 'no'
+    image: postgres:14.1-alpine
+    depends_on:
+      - pg
+    command: >
+      sh -c 'psql -h pg -U postgres'
+
+  adminer:
+    restart: 'no'
+    image: adminer:4.8.1-standalone
+    ports:
+      - 8083:8080
 
 volumes:
   redisdata:
@@ -143,9 +149,9 @@ volumes:
   mongodata:
     labels:
       - "net.maxime-baumann.iut"
-  cassdata:
+  neodata:
     labels:
       - "net.maxime-baumann.iut"
-  neodata:
+  pgdata:
     labels:
       - "net.maxime-baumann.iut"

@@ -13,7 +13,7 @@ stop: ## Stops all containers
 	$(COMPOSE) down
 
 purge: ## Destroy all docker envs, don't do this
-	docker container stop `$(ALL_CONTAINERS)`
+	docker container stop `$(ALL_CONTAINERS)` || true
 	docker container prune --filter label=net.maxime-baumann.iut -f
 	docker system prune -a --volumes --filter label=net.maxime-baumann.iut -f
 
@@ -47,22 +47,31 @@ stop-mongo: ## Stops MongoDB Containers
 	$(DOWN) mongo-express=0 mongo-express
 	$(DOWN) mongo=0 mongo
 
-start-cassandra: ## Starts Cassandra Container
-	$(UP) cassandra
-
-connect-cassandra: ## Connects to redis Server
-	$(CONNECT) cqlsh
-
-stop-cassandra: ## Stops Cassandra Container
-	$(DOWN) cassandra=0 cassandra
-
 start-neo4j: ## Starts Neo4j Container
 	$(UP) neo4j
 
 stop-neo4j: ## Stops Neo4j Container
 	$(DOWN) neo4j=0 neo4j
 
-.PHONY: help start stop start-sql connect-sql stop-sql start-redis connect-redis stop-redis start-mongo connect-mongo stop-mongo start-cassandra connect-cassandra stop-cassandra start-neo4j stop-neo4j
+start-pg: ## Starts Postgres Container
+	$(UP) pg
+
+connect-pg: ## Connects to Postgres
+	$(CONNECT) pgcli
+
+stop-pg: ## Stops Postgres Container
+	$(DOWN) pg=0 pg
+
+start-adminer: ## Starts Adminer Container
+	$(UP) adminer
+
+connect-adminer: ## Connects to Adminer
+	$(CONNECT) adminer
+
+stop-adminer: ## Stops Adminer Container
+	$(DOWN) adminer=0 adminer
+
+.PHONY: help start stop start-sql connect-sql stop-sql start-redis connect-redis stop-redis start-mongo connect-mongo stop-mongo start-neo4j stop-neo4j start-pg connect-pg stop-pg start-adminer connect-adminer stop-adminer
 
 .DEFAULT_GOAL := help
 
