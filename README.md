@@ -12,7 +12,7 @@ Sous unix ou wsl2, vous pouvez utiliser la commande `make` pour démarrer et arr
 
 > Vous aurez peut-être besoin d'installer make
 
-#### SQL Server
+#### Microsoft SQL Server
 
 | Action               | Commande           |
 |----------------------|--------------------|
@@ -52,6 +52,27 @@ Sous unix ou wsl2, vous pouvez utiliser la commande `make` pour démarrer et arr
 | Arrêter le SGBD      | `make stop-neo4j`              |
 | Se connecter au SGBD | [Neo4j](http://127.0.0.1:7474) |
 
+#### PostgreSQL
+
+| Action               | Commande          |
+|----------------------|-------------------|
+| Démmarer le SGBD     | `make start-pg`   |
+| Arrêter le SGBD      | `make stop-pg`    |
+| Se connecter au SGBD | `make connect-pg` |
+
+#### Adminer
+
+Adminer n'est pas un SGBD mais un utilitaire pour administrer des bases de données. Actuellement, il supporte les SGBDs suivants :
+
+- Microsoft SQL Server
+- PostgreSQL
+
+| Action                 | Commande                         |
+|------------------------|----------------------------------|
+| Démmarer l'outil       | `make start-adminer`             |
+| Arrêter l'outil        | `make stop-adminer`              |
+| Se connecter à l'outil | [Adminer](http://127.0.0.1:8083) |
+
 ### Tous systèmes
 
 L'ensemble des SGBD que l'on va utiliser sont portés sous docker, nous allons pour utiliser la commande `docker-compose` pour les démarrés et arrêtés à notre guide, ainsi que pour lancer des shells pour s'y connecter.
@@ -80,14 +101,6 @@ L'ensemble des SGBD que l'on va utiliser sont portés sous docker, nous allons p
 | Arrêter le SGBD      | `docker-compose up -d --scale mongo=0 --scale mongo-express=0 mongo mongo-express` |
 | Se connecter au SGBD | `docker-compose run mgcli`                                                         |
 
-#### Cassandra
-
-| Action               | Commande                                             |
-|----------------------|------------------------------------------------------|
-| Démmarer le SGBD     | `docker-compose up -d cassandra`                     |
-| Arrêter le SGBD      | `docker-compose up -d --scale cassandra=0 cassandra` |
-| Se connecter au SGBD | `docker-compose run cqlsh`                           |
-
 #### Neo4j
 
 | Action               | Commande                                     |
@@ -95,6 +108,27 @@ L'ensemble des SGBD que l'on va utiliser sont portés sous docker, nous allons p
 | Démmarer le SGBD     | `docker-compose up -d neo4j`                 |
 | Arrêter le SGBD      | `docker-compose up -d --scale neo4j=0 neo4j` |
 | Se connecter au SGBD | [Neo4j](http://127.0.0.1:7474)               |
+
+#### PostgreSQL
+
+| Action               | Commande                               |
+|----------------------|----------------------------------------|
+| Démmarer le SGBD     | `docker-compose up -d pg`              |
+| Arrêter le SGBD      | `docker-compose up -d --scale pg=0 pg` |
+| Se connecter au SGBD | `docker-compose run pgcli`             |
+
+#### Adminer
+
+Adminer n'est pas un SGBD mais un utilitaire pour administrer des bases de données. Actuellement, il supporte les SGBDs suivants :
+
+- Microsoft SQL Server
+- PostgreSQL
+
+| Action                 | Commande                                                                           |
+|------------------------|------------------------------------------------------------------------------------|
+| Démmarer l'outil       | `docker-compose up -d adminer`                                                     |
+| Arrêter l'outil        | `docker-compose up -d --scale adminer=0 adminer`                                   |
+| Se connecter à l'outil | [Adminer](http://127.0.0.1:8083)                                                   |
 
 Outils
 ------
@@ -107,3 +141,4 @@ Nous avons à disposition plusieurs IHM en mode web pour différents SGBDs
 | MongoDB    | [MongoExpress](http://127.0.0.1:8082)                                      |
 | Neo4j      | [Neo4j](http://127.0.0.1:7474)                                             |
 | Postgres   | [Adminer](http://127.0.0.1:8083)                                           |
+| MSSQL      | [Adminer](http://127.0.0.1:8083)                                           |
