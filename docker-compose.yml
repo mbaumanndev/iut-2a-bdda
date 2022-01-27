@@ -72,7 +72,7 @@ services:
       - 8081:80
     labels:
       - "net.maxime-baumann.iut"
-      
+
   mongo:
     restart: 'no'
     image: mongo:4.4.11
@@ -124,6 +124,8 @@ services:
       - POSTGRES_PASSWORD=Amiens2020!
     volumes:
       - pgdata:/var/lib/postgresql/data
+    labels:
+      - "net.maxime-baumann.iut"
 
   pgcli:
     restart: 'no'
@@ -132,12 +134,16 @@ services:
       - pg
     command: >
       sh -c 'psql -h pg -U postgres'
+    labels:
+      - "net.maxime-baumann.iut"
 
   adminer:
     restart: 'no'
     image: adminer:4.8.1-standalone
     ports:
       - 8083:8080
+    labels:
+      - "net.maxime-baumann.iut"
 
 volumes:
   redisdata:
