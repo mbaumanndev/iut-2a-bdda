@@ -1,6 +1,23 @@
 version: '3.4'
 
 services:
+  reverse-proxy:
+    image: traefik:v2.5
+    container_name: traefik
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - $PWD/traefik/traefik.toml:/etc/traefik/traefik.toml
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=Host(`vm-iut`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+      - "traefik.http.routers.api.service=api@internal"
+    networks:
+      - web
+
   mssql:
     restart: 'no'
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -13,6 +30,11 @@ services:
       - sqldata:/var/opt/mssql
     labels:
       - "net.maxime-baumann.iut"
+      - "traefik.enable=true"
+      - "traefik.http.routers.mssql.rule=Host(`vm-iut-mssql`)"
+      - "traefik.http.services.mssql.loadbalancer.server.port=1433"
+    networks:
+      - web
 
   sqlcmd:
     restart: 'no'
@@ -37,6 +59,11 @@ services:
       - redisdata:/data
     labels:
       - "net.maxime-baumann.iut"
+      - "traefik.enable=true"
+      - "traefik.http.routers.redis.rule=Host(`vm-iut-redis`)"
+      - "traefik.http.services.redis.loadbalancer.server.port=6379"
+    networks:
+      - web
 
   rcli:
     restart: 'no'
@@ -59,6 +86,13 @@ services:
       - redis
     labels:
       - "net.maxime-baumann.iut"
+      - "traefik.enable=true"
+      - "traefik.http.routers.readis.rule=Host(`vm-iut`) && PathPrefix(`/readis`)"
+      - "traefik.http.routers.readis.middlewares=strip-readis"
+      - "traefik.http.middlewares.strip-readis.stripprefix.prefixes=/readis"
+      - "traefik.http.services.readis.loadbalancer.server.port=8080"
+    networks:
+      - web
 
   phpredisadmin:
     restart: 'no'
@@ -72,6 +106,13 @@ services:
       - 8081:80
     labels:
       - "net.maxime-baumann.iut"
+      - "traefik.enable=true"
+      - "traefik.http.routers.phpredisadmin.rule=Host(`vm-iut`) && PathPrefix(`/phpredisadmin`)"
+      - "traefik.http.routers.phpredisadmin.middlewares=strip-phpredisadmin"
+      - "traefik.http.middlewares.strip-phpredisadmin.stripprefix.prefixes=/phpredisadmin"
+      - "traefik.http.services.phpredisadmin.loadbalancer.server.port=8081"
+    networks:
+      - web
 
   mongo:
     restart: 'no'
@@ -79,8 +120,15 @@ services:
     command: --serviceExecutor adaptive
     volumes:
       - mongodata:/data/db
+    ports:
+      - 27017:27017
     labels:
       - "net.maxime-baumann.iut"
+      - "traefik.enable=true"
+      - "traefik.http.routers.mongo.rule=Host(`vm-iut-mongo`)"
+      - "traefik.http.services.mongo.loadbalancer.server.port=27017"
+    networks:
+      - web
 
   mgcli:
     restart: 'no'
@@ -101,6 +149,13 @@ services:
       - mongo
     labels:
       - "net.maxime-baumann.iut"
+      - "traefik.enable=true"
+      - "traefik.http.routers.mongo-express.rule=Host(`vm-iut`) && PathPrefix(`/mongo-express`)"
+      - "traefik.http.routers.mongo-express.middlewares=strip-mongo-express"
+      - "traefik.http.middlewares.strip-mongo-express.stripprefix.prefixes=/mongo-express"
+      - "traefik.http.services.mongo-express.loadbalancer.server.port=8082"
+    networks:
+      - web
 
   neo4j:
     restart: 'no'
@@ -114,6 +169,13 @@ services:
       - neodata:/data
     labels:
       - "net.maxime-baumann.iut"
+      - "traefik.enable=true"
+      - "traefik.http.routers.neo4j.rule=Host(`vm-iut`) && PathPrefix(`/neo4j`)"
+      - "traefik.http.routers.neo4j.middlewares=strip-neo4j"
+      - "traefik.http.middlewares.strip-neo4j.stripprefix.prefixes=/neo4j"
+      - "traefik.http.services.neo4j.loadbalancer.server.port=7474"
+    networks:
+      - web
 
   pg:
     restart: 'no'
@@ -126,6 +188,11 @@ services:
       - pgdata:/var/lib/postgresql/data
     labels:
       - "net.maxime-baumann.iut"
+      - "traefik.enable=true"
+      - "traefik.http.routers.pg.rule=Host(`vm-iut-pg`)"
+      - "traefik.http.services.pg.loadbalancer.server.port=5432"
+    networks:
+      - web
 
   pgcli:
     restart: 'no'
@@ -144,6 +211,13 @@ services:
       - 8083:8080
     labels:
       - "net.maxime-baumann.iut"
+      - "traefik.enable=true"
+      - "traefik.http.routers.adminer.rule=Host(`vm-iut`) && PathPrefix(`/adminer`)"
+      - "traefik.http.routers.adminer.middlewares=strip-adminer"
+      - "traefik.http.middlewares.strip-adminer.stripprefix.prefixes=/adminer"
+      - "traefik.http.services.adminer.loadbalancer.server.port=8083"
+    networks:
+      - web
 
 volumes:
   redisdata:
@@ -161,3 +235,6 @@ volumes:
   pgdata:
     labels:
       - "net.maxime-baumann.iut"
+
+networks:
+  web:

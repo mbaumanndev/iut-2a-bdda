@@ -24,6 +24,24 @@ Sous unix ou wsl2, vous pouvez utiliser la commande `make` pour démarrer et arr
 
 > Vous aurez peut-être besoin d'installer make
 
+### VM IUT
+
+Sur les VMs de l'IUT, si vous êtes sur un poste de l'IUT, ne tenez pas compte des instructions suivantes.
+
+Si vous êtes sur votre poste personnel, assurez-vous de remplir au moins une des conditions suivantes :
+- Vous êtes connectés au réseau `upjv`
+- Vous êtes connectés au VPN UPJV
+
+Si vous remplissez ces conditions, il vous faut également ajouter les éléments suivants dans votre fichier host (en remplaçant `XXX` par la bonne IP) :
+
+```
+10.1.137.XXX    vm-iut
+10.1.137.XXX    vm-iut-mssql
+10.1.137.XXX    vm-iut-redis
+10.1.137.XXX    vm-iut-mongo
+10.1.137.XXX    vm-iut-pg
+```
+
 #### Microsoft SQL Server
 
 | Action               | Commande           |
