@@ -48,10 +48,12 @@ services:
       sh -c '/opt/mssql-tools/bin/sqlcmd -S mssql -U sa -P Amiens2020!'
     labels:
       - "net.maxime-baumann.iut"
+    networks:
+      - web
 
   redis:
     restart: 'no'
-    image: redislabs/redisearch:2.2.6
+    image: redislabs/redisearch:2.4.0
     command: --loglevel verbose
     ports:
       - 6379:6379
@@ -67,13 +69,15 @@ services:
 
   rcli:
     restart: 'no'
-    image: redislabs/redisearch:2.2.6
+    image: redislabs/redisearch:2.4.0
     depends_on:
       - redis
     command: >
       sh -c 'redis-cli -h redis '
     labels:
       - "net.maxime-baumann.iut"
+    networks:
+      - web
 
   readis:
     restart: 'no'
@@ -139,6 +143,8 @@ services:
       sh -c 'mongo --host mongo '
     labels:
       - "net.maxime-baumann.iut"
+    networks:
+      - web
 
   mongo-express:
     restart: 'no'
@@ -203,6 +209,8 @@ services:
       sh -c 'psql -h pg -U postgres'
     labels:
       - "net.maxime-baumann.iut"
+    networks:
+      - web
 
   adminer:
     restart: 'no'
